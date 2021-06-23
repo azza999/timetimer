@@ -1,3 +1,6 @@
+const _2PI = Math.PI * 2
+
+
 Array.prototype.find = function(finding) {
 	let newArr = []
 	this.map(ele=>{
@@ -15,7 +18,8 @@ const InputController = {
 		this._time = null
 	},
 	initEvent: function() {
-		this.input.addEventListener("keydown", this.checkKey)
+		this.input.addEventListener("keydown", (e)=>this.checkKey(e))
+		this.input.addEventListener("keyup", (e)=>this.setClockDuration(e))
 	},
 	checkKey: function(e) {
 
@@ -25,7 +29,9 @@ const InputController = {
 		if (!(num.find(e.key) || arrow.find(e.key))) {
 			e.preventDefault()
 		}
-		console.log(InputController.time)
+	},
+	setClockDuration: function() {
+		Clock.duration = this.input.value
 	},
 	get time() {
 		return InputController.input.value.match(/\d\d\d\d/) ? InputController.input.value : null
@@ -39,44 +45,84 @@ const Clock = {
 		this.startBtn = document.getElementById('start')
 		this.pauseBtn = document.getElementById('pause')
 
-		this.duration = Number(InputController.time) * 60
-		this.currentTime = 60 * 14 //seconds
+		this._duration = Number(InputController.time)
+		this.currentTime =  0 //60 * 15 //seconds
+
+		this.speed = 0.1
 
 		this.render()
 	},
-	initEvent: function() {
-
+	//남은시간 수정시 시간 및 상태 설정
+	set duration(val) {
+		this.pause()
+		this._duration = val
+		this.currentTime = 0
+		this.render()
+	},
+	initEvent: function () {
+		this.startBtn.addEventListener("click",e=>{
+			this.start()
+			this.toggleBtnVisible()
+		})
+		this.pauseBtn.addEventListener("click",e=>{
+			this.pause()
+			this.toggleBtnVisible()
+		})
 	},
 	render: function() {
 
-		let width = this.cvs.width
-		let height = this.cvs.height
-
-		let clockRect = {
-			top : {x: width/2, y: 0},
-			bottom : {x: width/2, y: height},
-			left : {x: 0, y: height/2},
-			right : {x: width, y: height/2},
-			center : {x: width/2 ,y: height/2}
+		this.clockRect = {
+			top : {x: this.cvs.width/2, y: 0},
+			bottom : {x: this.cvs.width/2, y: this.cvs.height},
+			left : {x: 0, y: this.cvs.height/2},
+			right : {x: this.cvs.width, y: this.cvs.height/2},
+			center : {x: this.cvs.width/2 ,y: this.cvs.height/2}
 		}
 
+		this.fillBackground()
+
+		this.fillPassedTime()
+	},
+	fillBackground: function() {
 
 		this.ctx.fillStyle = '#d44'
-
 		this.ctx.beginPath()
-		this.ctx.arc(clockRect.center.x,clockRect.center.y,width/2,0,Math.PI * 2)
+		this.ctx.arc(this.clockRect.center.x,this.clockRect.center.y,this.cvs.width / 2 - 1,0,Math.PI * 2)
 		this.ctx.fill()
-
-		this.ctx.fillStyle = '#fff'
-
-		this.ctx.beginPath()
-		this.ctx.arc(clockRect.center.x,clockRect.center.y,width/2,-Math.PI /2,Math.PI * 2 * (this.currentTime / this.duration) * 100 )
-		this.ctx.fill()
-
-		console.log(this.currentTime / this.duration * 100)
-
 
 	},
+	fillPassedTime: function() {
+		this.ctx.fillStyle = '#fff'
+		this.ctx.beginPath()
+		this.ctx.moveTo(this.clockRect.center.x, this.clockRect.center.y)
+		this.ctx.lineTo(this.clockRect.top.x, this.clockRect.top.y)
+
+		let deg = this.remainTime2Degree(this.currentTime)
+
+		this.ctx.arc(this.clockRect.center.x,this.clockRect.center.y,this.cvs.width/2,-Math.PI / 2, -Math.PI / 2 + deg)
+		this.ctx.fill()
+	},
+	remainTime2Degree: function(time) {
+		let percentage = time / this._duration
+		let deg = _2PI * percentage
+		return deg
+	},
+	start: function() {
+		this.interval = setInterval(()=>{
+			this.currentTime += this.speed
+			this.render()
+		},1000 * this.speed / 10)
+	},
+	pause: function() {
+		console.log(this.interval)
+		clearInterval(this.interval)
+	},
+
+	// ui control
+	toggleBtnVisible: function() {
+		this.startBtn.classList.toggle('visible')
+		this.pauseBtn.classList.toggle('visible')
+	}
 }
 
 window.onload = e=>{

@@ -10,7 +10,10 @@
 
 /* 메인 캔버스 */
 #timer-box { width: 100vw; height: 100vh; display: flex; justify-content: center; align-items: center; }
-#timer { border: 1px solid #000; }
+#timer { width: 800px; height: 800px; }
 #remain-time { position: absolute; top: 100px; }
 #controlbox { position: absolute; bottom: 100px; }
 
+#start, #pause { display: none; font-size: 3em; }
+
+#start.visible, #pause.visible { display: block }
