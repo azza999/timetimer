@@ -53,7 +53,12 @@ const Clock = {
 		this.speed = 0.01
 		this.status = 'stopped'
 
+		// background
+		this.bgcvs = document.getElementById('timer-background')
+		this.bgctx = this.bgcvs.getContext('2d')
+
 		this.render()
+		this.renderBackground()
 	},
 	//남은시간 수정시 시간 및 상태 설정
 	set duration(val) {
@@ -91,7 +96,7 @@ const Clock = {
 	},
 	fillBackground: function() {
 
-		this.ctx.fillStyle = '#d44'
+		this.ctx.fillStyle = '#d33'
 		this.ctx.beginPath()
 		this.ctx.arc(this.clockRect.center.x,this.clockRect.center.y,this.cvs.width / 2 - 1,0,Math.PI * 2)
 		this.ctx.fill()
@@ -157,7 +162,42 @@ const Clock = {
 			this.pauseBtn.classList.remove('visible')
 		}
 
-	}
+	},
+
+	//background
+	renderBackground: function() {
+
+		let deg = 10
+
+		this.bgctx.translate(this.bgcvs.width / 2, this.bgcvs.height / 2)
+		
+		this.bgctx.beginPath()
+		this.bgctx.arc(0,0,30,0,_2PI)
+		this.bgctx.fill()
+
+		this.bgctx.strokeStyle = '#000'
+		this.bgctx.lineWidth = 3
+		
+		// this.bgctx.beginPath()
+		// this.bgctx.arc(0,0,this.bgcvs.width / 2 - 10, 0, _2PI)
+		// this.bgctx.stroke()
+
+
+		for (let i = 0; i < 360; i += deg) {
+			let lengthPrefix = i % 15 == 0 ? 10 : 0
+			this.bgctx.lineWidth = i % 15 == 0 ? 3 : 1
+			
+			this.bgctx.beginPath()
+			this.bgctx.moveTo(0,-this.bgcvs.height / 2 + 70)
+			this.bgctx.lineTo(0,-this.bgcvs.height / 2 + 50 - lengthPrefix)
+			this.bgctx.stroke()
+			this.bgctx.rotate(Math.PI * 2 * deg / 360)
+		}
+
+
+
+		this.bgctx.moveTo
+	},
 }
 
 let Hand = {
