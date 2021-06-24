@@ -14,7 +14,6 @@ Array.prototype.find = function(finding) {
 const InputController = {
 	init: function() {
 		this.input = document.getElementById('input-time')
-		console.log('init')
 		this._time = null
 	},
 	initEvent: function() {
@@ -34,7 +33,7 @@ const InputController = {
 		Clock.duration = this.input.value
 	},
 	get time() {
-		return InputController.input.value.match(/\d\d\d\d/) ? InputController.input.value : null
+		return InputController.input.value
 	}
 }
 
@@ -44,11 +43,15 @@ const Clock = {
 		this.ctx = this.cvs.getContext('2d')
 		this.startBtn = document.getElementById('start')
 		this.pauseBtn = document.getElementById('pause')
+		this.title = document.getElementsByTagName('title')[0]
+
+		this.timePrefix = 1 // for debug
 
 		this._duration = Number(InputController.time)
 		this.currentTime =  0 //60 * 15 //seconds
 
-		this.speed = 0.1
+		this.speed = 0.01
+		this.status = 'stopped'
 
 		this.render()
 	},
@@ -59,14 +62,15 @@ const Clock = {
 		this.currentTime = 0
 		this.render()
 	},
+	get duration() {
+		return this._duration
+	},
 	initEvent: function () {
 		this.startBtn.addEventListener("click",e=>{
 			this.start()
-			this.toggleBtnVisible()
 		})
 		this.pauseBtn.addEventListener("click",e=>{
 			this.pause()
-			this.toggleBtnVisible()
 		})
 	},
 	render: function() {
@@ -80,8 +84,10 @@ const Clock = {
 		}
 
 		this.fillBackground()
-
 		this.fillPassedTime()
+		this.renderTitle()
+
+		Hand.render(this.currentTime, this.duration)
 	},
 	fillBackground: function() {
 
@@ -97,37 +103,118 @@ const Clock = {
 		this.ctx.moveTo(this.clockRect.center.x, this.clockRect.center.y)
 		this.ctx.lineTo(this.clockRect.top.x, this.clockRect.top.y)
 
-		let deg = this.remainTime2Degree(this.currentTime)
+		let deg = this.remainTime2Degree()
 
 		this.ctx.arc(this.clockRect.center.x,this.clockRect.center.y,this.cvs.width/2,-Math.PI / 2, -Math.PI / 2 + deg)
 		this.ctx.fill()
 	},
-	remainTime2Degree: function(time) {
-		let percentage = time / this._duration
+	remainTime2Degree: function() {
+		let percentage = this.currentTime / this._duration
 		let deg = _2PI * percentage
 		return deg
 	},
+	renderTitle: function() {
+		this.title.innerHTML = Math.floor(this.currentTime) + ' - ' + this.status
+	},
 	start: function() {
+		this.status = 'running'
+
 		this.interval = setInterval(()=>{
 			this.currentTime += this.speed
 			this.render()
-		},1000 * this.speed / 10)
+
+			this.currentTime >= this.duration ? this.stop() : null;
+
+		},1000 * this.speed / this.timePrefix)
+		this.updateUI()
 	},
 	pause: function() {
-		console.log(this.interval)
+		this.status = 'paused'
+
 		clearInterval(this.interval)
+		this.updateUI()
+	},
+	stop: function() {
+		this.status = 'stopped'
+
+		this.currentTime = 0
+		clearInterval(this.interval)
+
+		this.render()
+
+		this.updateUI()
+
+		alert('timer end!')
 	},
 
 	// ui control
-	toggleBtnVisible: function() {
-		this.startBtn.classList.toggle('visible')
-		this.pauseBtn.classList.toggle('visible')
+	updateUI: function() {
+		if(this.status == 'running') {
+			this.startBtn.classList.remove('visible')
+			this.pauseBtn.classList.add('visible')
+		} else {
+			this.startBtn.classList.add('visible')
+			this.pauseBtn.classList.remove('visible')
+		}
+
 	}
+}
+
+let Hand = {
+	init: function() {
+		this.cvs = document.getElementById('timer-hand')
+		this.ctx = this.cvs.getContext('2d')
+		this.handRect = {
+			center: {x: this.cvs.width / 2, y: this.cvs.height / 2}
+		}
+
+		this.deg = null;
+
+	},
+	render: function(cTime,duration) {
+
+
+		this.deg = cTime / duration * Math.PI * 2
+
+		this.cvs.width = this.cvs.width
+
+		this.renderCenter()
+		this.renderHand()
+
+	},
+	renderCenter: function() {
+
+		this.ctx.fillStyle = "#333"
+		this.ctx.beginPath()
+		this.ctx.arc(this.handRect.center.x, this.handRect.center.y, this.cvs.width / 4, 0, _2PI)
+		this.ctx.fill();
+	},
+	renderHand: function() {
+		this.ctx.fillStyle = '#333'
+
+		
+		this.ctx.translate(this.cvs.width / 2,this.cvs.height / 2);
+		this.ctx.rotate(this.deg)
+
+		this.ctx.beginPath()
+		this.ctx.moveTo(-5,0)
+		this.ctx.lineTo(0,-this.cvs.height/2)
+		this.ctx.lineTo(5,0)
+		this.ctx.fill()
+
+		this.ctx.rotate(-this.deg)
+		this.ctx.translate(-this.cvs.width / 2, this.cvs.height / 2);
+	},
 }
 
 window.onload = e=>{
 	InputController.init()
 	InputController.initEvent()
+	
+	Hand.init();
+	Hand.render();
+	
 	Clock.init()
 	Clock.initEvent()
+
 }
