@@ -7,27 +7,17 @@
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<div id="ui">
-		<div id="time-box">
-			<label for="time">
-				<input type="text" id="input-time" value="3600">
-			</label>
-		</div>
-		<div id="alarm-box">
-			<label for="alarm">
-				alarm
-				<input type="checkbox" id="input-alarm">
-			</label>
-		</div>
-		<div id="apply-btn"></div>
-	</div>
 
 	<div id="timer-box">
 		<div id="remain-time">
-			<span id="remain-hour-10"></span>
-			<span id="remain-hour-1"></span>
-			<span id="remain-minute-10"></span>
-			<span id="remain-minute-1"></span>
+			<span id="remain-hour-10">1</span>
+			<span id="remain-hour-1">2</span>
+			<span>:</span>
+			<span id="remain-minute-10">3</span>
+			<span id="remain-minute-1">4</span>
+			<span>:</span>
+			<span id="remain-second-10">3</span>
+			<span id="remain-second-1">4</span>
 		</div>
 		<canvas id="timer-background" width="850" height="850"></canvas>	
 		<canvas id="timer" width="1600" height="1600"></canvas>	
@@ -38,6 +28,11 @@
 				<div id="pause">ll</div>
 			</div>
 		</div>
+	<div id="time-box">
+		<label for="time" id="input-time-label">
+			<input type="text" id="input-time" value="60">
+		</label>
+	</div>
 	</div>
 
 	<div id="ui-hide">

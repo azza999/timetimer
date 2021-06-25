@@ -1,6 +1,5 @@
 const _2PI = Math.PI * 2
 
-
 Array.prototype.find = function(finding) {
 	let newArr = []
 	this.map(ele=>{
@@ -43,6 +42,15 @@ const Clock = {
 		this.ctx = this.cvs.getContext('2d')
 		this.startBtn = document.getElementById('start')
 		this.pauseBtn = document.getElementById('pause')
+		this.hideBtn = document.getElementById('ui-hide')
+		this.remainTime = {
+			h10: document.getElementById('remain-hour-10'),
+			h1: document.getElementById('remain-hour-1'),
+			m10: document.getElementById('remain-minute-10'),
+			m1: document.getElementById('remain-minute-1'),
+			s10: document.getElementById('remain-second-10'),
+			s1: document.getElementById('remain-second-1')
+		}
 		this.title = document.getElementsByTagName('title')[0]
 
 		this.timePrefix = 1 // for debug
@@ -91,6 +99,7 @@ const Clock = {
 		this.fillBackground()
 		this.fillPassedTime()
 		this.renderTitle()
+		this.renderCurrentTime()
 
 		Hand.render(this.currentTime, this.duration)
 	},
@@ -121,11 +130,27 @@ const Clock = {
 	renderTitle: function() {
 		this.title.innerHTML = Math.floor(this.currentTime) + ' - ' + this.status
 	},
+	renderCurrentTime: function() {
+
+		let rounded = Math.round(this.currentTime)
+
+		let hour =  Math.floor(rounded / 3600)
+		let minute = Math.floor(rounded / 60) - hour * 60
+		let second = rounded - hour * 3600 - minute * 60
+
+		this.remainTime.h10.innerHTML = Math.floor(hour / 10)
+		this.remainTime.h1.innerHTML = hour % 10
+		this.remainTime.m10.innerHTML = Math.floor(minute / 10)
+		this.remainTime.m1.innerHTML = minute % 10
+		this.remainTime.s10.innerHTML = Math.floor(second / 10)
+		this.remainTime.s1.innerHTML = second % 10
+	},
 	start: function() {
 		this.status = 'running'
 
 		this.interval = setInterval(()=>{
 			this.currentTime += this.speed
+			this.currentTime = Math.round(this.currentTime*100)/100
 			this.render()
 
 			this.currentTime >= this.duration ? this.stop() : null;
@@ -200,7 +225,7 @@ const Clock = {
 	},
 }
 
-let Hand = {
+const Hand = {
 	init: function() {
 		this.cvs = document.getElementById('timer-hand')
 		this.ctx = this.cvs.getContext('2d')
@@ -237,9 +262,9 @@ let Hand = {
 		this.ctx.rotate(this.deg)
 
 		this.ctx.beginPath()
-		this.ctx.moveTo(-5,0)
+		this.ctx.moveTo(-7,0)
 		this.ctx.lineTo(0,-this.cvs.height/2)
-		this.ctx.lineTo(5,0)
+		this.ctx.lineTo(7,0)
 		this.ctx.fill()
 
 		this.ctx.rotate(-this.deg)
