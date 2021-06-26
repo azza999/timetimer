@@ -13,20 +13,34 @@ Array.prototype.find = function(finding) {
 const InputController = {
 	init: function() {
 		this.input = document.getElementById('input-time')
+		this.tmp = this.input.value
 		this._time = null
 	},
 	initEvent: function() {
-		this.input.addEventListener("keydown", (e)=>this.checkKey(e))
-		this.input.addEventListener("keyup", (e)=>this.setClockDuration(e))
+		this.input.addEventListener("keydown", e=>this.checkKey(e))
+		this.input.addEventListener("keyup", (e)=>{this.checkKey(e);this.setClockDuration(e)})
 	},
 	checkKey: function(e) {
 
+		// 키 검증
 		const num = ["0","1","2","3","4","5","6","7","8","9"]
-		const arrow = ["ArrowUp","ArrowBottom","ArrowLeft","ArrowRight","Backspace","Delete","End","Home","Insert","PageDown","PageUp"]
+		const arrow = ["ArrowUp","ArrowBottom","ArrowLeft","ArrowRight","Backspace","Delete","End","Home","Insert","PageDown","PageUp",":"]
+
+		console.log(e)
+
+		if (e.key == 'Process') {
+			console.log(this.tmp)
+			this.input.value = this.tmp
+		}
+
+		this.tmp = this.input.value
 
 		if (!(num.find(e.key) || arrow.find(e.key))) {
-			e.preventDefault()
+			console.log('default')
+			return e.preventDefault()
 		}
+
+
 	},
 	setClockDuration: function() {
 		Clock.duration = this.input.value

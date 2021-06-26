@@ -4,7 +4,7 @@
 #ui { position: absolute; left: 5%; width: 400px; height: 800px; top: 45%; transform: translateY(-50%); z-index: 9999; }
 
 /* UI 내부 시간 설정 */
-#time-box { position: absolute; bottom: 150px;}
+#time-box { position: absolute; bottom: 200px;}
 #input-time-label { width: 100%; display: block; }
 #time { width: 100%; }
 #input-time { width: 100%; height: 50px; padding: 5px 10px; font-size: 1.5em; }
@@ -15,7 +15,7 @@
 #timer-background { width: 700px; height: 700px; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); }
 #timer { width: 600px; height: 600px; position: relative; }
 #timer-hand { width: 100px; height: 100px; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); }
-#remain-time { position: absolute; top: 20%; font-size: 3em; }
+#remain-time { position: absolute; top: 17%; font-size: 4em; }
 #controlbox { position: absolute; bottom: 100px; }
 
 #start, #pause { display: none; font-size: 3em; }
@@ -24,3 +24,9 @@
 
 
 #onoff { cursor: pointer; text-align: center; }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
